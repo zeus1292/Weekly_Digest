@@ -3,25 +3,25 @@ import { createServer, type Server } from "http";
 import { z } from "zod";
 import { searchRequestSchema, digestResponseSchema } from "@shared/schema";
 import { ArxivService } from "./services/arxiv";
-import { OpenAIService } from "./services/openai";
+import { GeminiService } from "./services/gemini";
 
 const arxivService = new ArxivService();
-const openaiService = new OpenAIService();
+const geminiService = new GeminiService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
-  // Health check endpoint for OpenAI API
+  // Health check endpoint for Gemini API
   app.get("/api/health", async (req, res) => {
     try {
-      // Test OpenAI connection with a simple request
-      const testResult = await openaiService.testConnection();
+      // Test Gemini connection with a simple request
+      const testResult = await geminiService.testConnection();
       
       res.json({
         status: "healthy",
         services: {
           arxiv: "available",
-          openai: testResult.working ? "available" : "error",
-          openaiError: testResult.error || null
+          gemini: testResult.working ? "available" : "error",
+          geminiError: testResult.error || null
         },
         timestamp: new Date().toISOString()
       });
@@ -58,10 +58,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Check OpenAI API before processing
-      const healthCheck = await openaiService.testConnection();
+      // Check Gemini API before processing
+      const healthCheck = await geminiService.testConnection();
       if (!healthCheck.working) {
-        // Return papers without summaries if OpenAI is not working
+        // Return papers without summaries if Gemini is not working
         const response = {
           topic: validatedData.topic,
           papers: papers,
@@ -72,8 +72,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(response);
       }
 
-      // Generate summaries using OpenAI
-      const summarizedPapers = await openaiService.summarizeMultiplePapers(papers);
+      // Generate summaries using Gemini
+      const summarizedPapers = await geminiService.summarizeMultiplePapers(papers);
 
       const response = {
         topic: validatedData.topic,

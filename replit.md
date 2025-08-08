@@ -42,10 +42,10 @@ The application follows a monorepo structure with shared TypeScript types and sc
 
 ### External Service Integration
 - **Research Data**: arXiv API for fetching academic papers
-- **AI Processing**: OpenAI GPT-4o for paper summarization and analysis
+- **AI Processing**: Google Gemini API for paper summarization and analysis (free alternative to OpenAI)
 - **Paper Processing**: Fast-XML-Parser for handling arXiv's XML responses
 
-**Design Decision**: arXiv provides comprehensive academic paper data, while GPT-4o offers sophisticated text analysis capabilities for generating meaningful summaries.
+**Design Decision**: arXiv provides comprehensive academic paper data, while Google Gemini offers sophisticated text analysis capabilities with generous free usage limits, eliminating rate limit concerns.
 
 ### API Architecture
 The application exposes a single primary endpoint `/api/generate-digest` that orchestrates the entire workflow:
@@ -75,7 +75,7 @@ The application exposes a single primary endpoint `/api/generate-digest` that or
 
 ### Core Infrastructure
 - **Database**: PostgreSQL via Neon serverless platform
-- **AI Services**: OpenAI API for GPT-4o text processing
+- **AI Services**: Google Gemini API for free text processing and summarization
 - **Academic Data**: arXiv API for research paper retrieval
 
 ### Key Libraries
