@@ -36,31 +36,32 @@ export function SearchForm({ onSearch }: SearchFormProps) {
             name="topic"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700">
-                  Research Topic *
-                </FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Input
-                      placeholder="e.g., Agentic AI, Transformer Architecture, Computer Vision"
-                      className="px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
-                      {...field}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          form.handleSubmit(handleSubmit)();
-                        }
-                      }}
-                    />
-                    <Button
-                      type="submit"
-                      size="sm"
-                      className="absolute right-1 top-1 bottom-1 px-3 bg-primary hover:bg-blue-700"
-                    >
-                      <Search className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </FormControl>
+                <div className="flex items-center gap-4">
+                  <FormLabel className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                    Research Topic
+                  </FormLabel>
+                  <FormControl>
+                    <div className="flex-1 flex items-center gap-2">
+                      <Input
+                        placeholder="e.g., Agentic AI, Transformer Architecture, Computer Vision"
+                        className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+                        {...field}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            form.handleSubmit(handleSubmit)();
+                          }
+                        }}
+                      />
+                      <Button
+                        type="submit"
+                        className="px-4 py-3 bg-primary hover:bg-blue-700 rounded-lg"
+                      >
+                        <Search className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </FormControl>
+                </div>
                 <FormMessage />
               </FormItem>
             )}
