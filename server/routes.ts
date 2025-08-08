@@ -79,14 +79,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error generating demo digest:', error);
       
       if (error instanceof z.ZodError) {
+        const topicError = error.errors.find(e => e.path.includes('topic'));
+        if (topicError) {
+          return res.status(400).json({ 
+            message: "Please enter a research topic to search for papers."
+          });
+        }
         return res.status(400).json({ 
-          message: "Invalid request data", 
-          errors: error.errors 
+          message: "Please check your search parameters and try again."
         });
       }
       
       res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Failed to generate digest" 
+        message: "We encountered a temporary issue. Please try again in a moment."
       });
     }
   });
@@ -145,14 +150,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error generating digest:', error);
       
       if (error instanceof z.ZodError) {
+        const topicError = error.errors.find(e => e.path.includes('topic'));
+        if (topicError) {
+          return res.status(400).json({ 
+            message: "Please enter a research topic to search for papers."
+          });
+        }
         return res.status(400).json({ 
-          message: "Invalid request data", 
-          errors: error.errors 
+          message: "Please check your search parameters and try again."
         });
       }
       
       res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Failed to generate digest" 
+        message: "We encountered a temporary issue. Please try again in a moment."
       });
     }
   });

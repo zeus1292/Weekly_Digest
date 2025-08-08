@@ -112,6 +112,10 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                 type="button"
                 onClick={() => {
                   const data = form.getValues();
+                  if (!data.topic || data.topic.trim() === '') {
+                    form.setError('topic', { message: 'Please enter a research topic' });
+                    return;
+                  }
                   onSearch({ ...data, demo: true } as any);
                 }}
                 variant="outline"
