@@ -72,7 +72,7 @@ export class ArxivService {
           return publishedDate >= sevenDaysAgo;
         })
         .map(entry => this.convertToPaper(entry))
-        .slice(0, 10); // Limit to 10 papers for weekly digest
+        .slice(0, 3); // Limit to 3 papers to avoid OpenAI rate limits
 
       return papers;
     } catch (error) {

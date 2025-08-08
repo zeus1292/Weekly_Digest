@@ -90,13 +90,34 @@ Focus on being concise, accurate, and highlighting practical implications.
   async summarizeMultiplePapers(papers: Paper[]): Promise<Paper[]> {
     const summarizedPapers: Paper[] = [];
     
-    // Process papers in batches to respect rate limits
-    for (const paper of papers) {
-      const summarized = await this.summarizePaper(paper);
-      summarizedPapers.push(summarized);
+    // Limit to 3 papers maximum to avoid rate limits
+    const limitedPapers = papers.slice(0, 3);
+    
+    // Process papers sequentially with throttling to respect rate limits
+    for (let i = 0; i < limitedPapers.length; i++) {
+      const paper = limitedPapers[i];
       
-      // Add small delay to respect rate limits
-      await new Promise(resolve => setTimeout(resolve, 100));
+      try {
+        const summarized = await this.summarizePaper(paper);
+        summarizedPapers.push(summarized);
+        
+        // Add 2-second delay between requests to avoid rate limits
+        if (i < limitedPapers.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      } catch (error) {
+        console.error(`Failed to summarize paper ${paper.id}:`, error);
+        
+        // Add paper with error summary
+        summarizedPapers.push({
+          ...paper,
+          summary: {
+            keyFindings: "Summary unavailable due to rate limits",
+            methodology: "Please try again later",
+            significance: "Refer to abstract for details"
+          }
+        });
+      }
     }
     
     return summarizedPapers;
