@@ -107,13 +107,27 @@ export function SearchForm({ onSearch }: SearchFormProps) {
               <Clock className="w-4 h-4 mr-1" />
               Papers from the last 7 days
             </div>
-            <Button
-              type="submit"
-              className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-primary focus:ring-offset-2"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              Generate Weekly Digest
-            </Button>
+            <div className="flex space-x-3">
+              <Button
+                type="button"
+                onClick={() => {
+                  const data = form.getValues();
+                  onSearch({ ...data, demo: true } as any);
+                }}
+                variant="outline"
+                className="px-4 py-3 border-primary text-primary hover:bg-primary hover:text-white transition-colors"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Demo Mode
+              </Button>
+              <Button
+                type="submit"
+                className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generate Weekly Digest
+              </Button>
+            </div>
           </div>
         </form>
       </Form>
