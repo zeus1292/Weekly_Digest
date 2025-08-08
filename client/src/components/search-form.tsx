@@ -37,32 +37,22 @@ export function SearchForm({ onSearch }: SearchFormProps) {
             name="topic"
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center gap-4">
-                  <FormLabel className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                    Research Topic
-                  </FormLabel>
-                  <FormControl>
-                    <div className="flex-1 flex items-center gap-2">
-                      <Input
-                        placeholder="e.g., Agentic AI, Transformer Architecture, Computer Vision"
-                        className="px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 hover:border-gray-300"
-                        {...field}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            form.handleSubmit(handleSubmit)();
-                          }
-                        }}
-                      />
-                      <Button
-                        type="submit"
-                        className="px-4 py-3 bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white rounded-lg shadow-sm transition-all duration-200"
-                      >
-                        <Search className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </FormControl>
-                </div>
+                <FormLabel className="text-sm font-medium text-gray-700">
+                  Research Topic
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g., Agentic AI, Transformer Architecture, Computer Vision"
+                    className="px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 hover:border-gray-300"
+                    {...field}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        form.handleSubmit(handleSubmit)();
+                      }
+                    }}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
