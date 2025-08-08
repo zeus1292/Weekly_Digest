@@ -34,67 +34,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Demo endpoint with mock AI summaries
-  app.post("/api/generate-digest-demo", async (req, res) => {
-    try {
-      // Validate request body
-      const validatedData = searchRequestSchema.parse(req.body);
-      
-      // Fetch real papers from ArXiv
-      const papers = await arxivService.searchPapers(
-        validatedData.topic,
-        validatedData.keywords,
-        validatedData.subdomain
-      );
 
-      if (papers.length === 0) {
-        return res.json({
-          topic: validatedData.topic,
-          papers: [],
-          generatedDate: new Date().toISOString(),
-          count: 0,
-        });
-      }
-
-      // Add demo AI summaries to papers
-      const papersWithDemoSummaries = papers.map(paper => ({
-        ...paper,
-        summary: {
-          keyFindings: `This research presents novel approaches to ${validatedData.topic}, demonstrating significant improvements over existing methods with measurable performance gains.`,
-          methodology: `The authors employ a comprehensive experimental framework combining theoretical analysis with empirical validation across multiple datasets and benchmarks.`,
-          significance: `This work addresses key limitations in current ${validatedData.topic} research and opens new directions for future investigations in the field.`
-        }
-      }));
-
-      const response = {
-        topic: validatedData.topic,
-        papers: papersWithDemoSummaries,
-        generatedDate: new Date().toISOString(),
-        count: papersWithDemoSummaries.length,
-        demo: true
-      };
-
-      res.json(response);
-    } catch (error) {
-      console.error('Error generating demo digest:', error);
-      
-      if (error instanceof z.ZodError) {
-        const topicError = error.errors.find(e => e.path.includes('topic'));
-        if (topicError) {
-          return res.status(400).json({ 
-            message: "Please enter a research topic to search for papers."
-          });
-        }
-        return res.status(400).json({ 
-          message: "Please check your search parameters and try again."
-        });
-      }
-      
-      res.status(500).json({ 
-        message: "We encountered a temporary issue. Please try again in a moment."
-      });
-    }
-  });
 
   // Generate weekly digest endpoint
   app.post("/api/generate-digest", async (req, res) => {

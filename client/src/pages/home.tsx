@@ -22,7 +22,7 @@ export default function Home() {
     queryFn: async () => {
       if (!searchParams) return null;
       
-      const endpoint = (searchParams as any).demo ? '/api/generate-digest-demo' : '/api/generate-digest';
+      const endpoint = '/api/generate-digest';
       const response = await apiRequest('POST', endpoint, searchParams);
       return response.json() as Promise<DigestResponse>;
     },
@@ -134,13 +134,7 @@ export default function Home() {
                 </p>
               </div>
             )}
-            {(digest as any).demo && (
-              <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  <strong>Demo Mode:</strong> Showing real papers with sample AI summaries to demonstrate functionality
-                </p>
-              </div>
-            )}
+
 
             {digest.papers.length === 0 ? (
               <div className="text-center py-12">
