@@ -100,8 +100,8 @@ export default function Home() {
         {/* Results Section */}
         {digest && !isLoading && (
           <section>
-            <div className="flex items-center justify-between mb-8">
-              <div>
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900">
                   Weekly Digest: <span className="text-primary">{digest.topic}</span>
                 </h2>
@@ -113,22 +113,8 @@ export default function Home() {
                     day: 'numeric'
                   })}
                 </p>
-                {(digest as any).warning && (
-                  <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-sm text-yellow-800">
-                      <strong>Note:</strong> {(digest as any).warning}
-                    </p>
-                  </div>
-                )}
-                {(digest as any).demo && (
-                  <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800">
-                      <strong>Demo Mode:</strong> Showing real papers with sample AI summaries to demonstrate functionality
-                    </p>
-                  </div>
-                )}
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3 ml-6">
                 <button 
                   onClick={handleNewSearch}
                   className="px-4 py-2 text-secondary hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -145,6 +131,22 @@ export default function Home() {
                 </button>
               </div>
             </div>
+
+            {/* Full-width notifications */}
+            {(digest as any).warning && (
+              <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>Note:</strong> {(digest as any).warning}
+                </p>
+              </div>
+            )}
+            {(digest as any).demo && (
+              <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Demo Mode:</strong> Showing real papers with sample AI summaries to demonstrate functionality
+                </p>
+              </div>
+            )}
 
             {digest.papers.length === 0 ? (
               <div className="text-center py-12">
