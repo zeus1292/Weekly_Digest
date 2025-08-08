@@ -111,15 +111,15 @@ export default function Home() {
               <div className="flex items-center space-x-3 ml-6">
                 <button 
                   onClick={handleNewSearch}
-                  className="px-4 py-2 text-secondary hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 text-secondary hover:text-gray-900 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 transform hover:scale-105"
                 >
                   New Search
                 </button>
-                <button className="px-4 py-2 text-secondary hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <button className="px-4 py-2 text-secondary hover:text-gray-900 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 transform hover:scale-105">
                   <Download className="w-4 h-4 mr-2 inline" />
                   Export
                 </button>
-                <button className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-emerald-600 transition-colors">
+                <button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
                   <Share className="w-4 h-4 mr-2 inline" />
                   Share
                 </button>
@@ -128,8 +128,11 @@ export default function Home() {
 
             {/* Full-width notifications */}
             {(digest as any).warning && (
-              <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-yellow-800">
+              <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded-lg shadow-sm">
+                <p className="text-sm text-yellow-800 flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
                   <strong>Note:</strong> {(digest as any).warning}
                 </p>
               </div>

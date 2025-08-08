@@ -28,7 +28,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 p-8 hover:shadow-xl transition-shadow duration-300">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <FormField
@@ -44,7 +44,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                     <div className="flex-1 flex items-center gap-2">
                       <Input
                         placeholder="e.g., Agentic AI, Transformer Architecture, Computer Vision"
-                        className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+                        className="px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 hover:border-gray-300"
                         {...field}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -55,7 +55,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                       />
                       <Button
                         type="submit"
-                        className="px-4 py-3 bg-primary text-white hover:bg-blue-700 rounded-lg shadow-sm border-0"
+                        className="px-4 py-3 bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white rounded-lg shadow-sm transition-all duration-200"
                       >
                         <Search className="w-4 h-4" />
                       </Button>
@@ -79,7 +79,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                   <FormControl>
                     <Input
                       placeholder="neural networks, attention mechanism"
-                      className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 hover:border-gray-300"
                       {...field}
                     />
                   </FormControl>
@@ -98,7 +98,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                   </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white">
+                      <SelectTrigger className="px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white transition-all duration-200 hover:border-gray-300">
                         <SelectValue placeholder="All Areas" />
                       </SelectTrigger>
                     </FormControl>
@@ -125,9 +125,9 @@ export function SearchForm({ onSearch }: SearchFormProps) {
             </div>
             <Button
               type="submit"
-              className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              className="px-6 py-3 bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 focus:ring-2 focus:ring-primary focus:ring-offset-2 shadow-lg"
             >
-              <Sparkles className="w-4 h-4 mr-2" />
+              <Sparkles className="w-5 h-5 mr-2 animate-pulse" />
               Generate Weekly Digest
             </Button>
           </div>

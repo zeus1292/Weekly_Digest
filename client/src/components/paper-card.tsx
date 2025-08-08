@@ -49,7 +49,7 @@ export function PaperCard({ paper }: PaperCardProps) {
   };
 
   return (
-    <Card className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <Card className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-primary/20 transition-all duration-300 transform hover:-translate-y-1">
       <CardContent className="p-0">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
@@ -58,7 +58,7 @@ export function PaperCard({ paper }: PaperCardProps) {
                 href={paper.arxivUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-primary transition-colors"
+                className="hover:text-primary transition-colors hover:underline decoration-2 underline-offset-2"
               >
                 {paper.title}
               </a>
