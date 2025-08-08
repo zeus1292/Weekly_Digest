@@ -57,12 +57,6 @@ export default function Home() {
             </div>
             <nav className="hidden md:flex items-center space-x-6">
               {/* <HealthCheck /> */}
-              <button 
-                onClick={handleNewSearch}
-                className="text-gray-700 hover:text-primary transition-colors"
-              >
-                New Search
-              </button>
             </nav>
           </div>
         </div>
