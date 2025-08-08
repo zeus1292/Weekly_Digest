@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Sparkles, Clock } from "lucide-react";
+import { Sparkles, Clock, Search } from "lucide-react";
 
 interface SearchFormProps {
   onSearch: (params: SearchRequest) => void;
@@ -40,11 +40,26 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                   Research Topic *
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="e.g., Agentic AI, Transformer Architecture, Computer Vision"
-                    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Input
+                      placeholder="e.g., Agentic AI, Transformer Architecture, Computer Vision"
+                      className="px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+                      {...field}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          form.handleSubmit(handleSubmit)();
+                        }
+                      }}
+                    />
+                    <Button
+                      type="submit"
+                      size="sm"
+                      className="absolute right-1 top-1 bottom-1 px-3 bg-primary hover:bg-blue-700"
+                    >
+                      <Search className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -103,8 +103,8 @@ Focus on being concise, accurate, and highlighting practical implications.
   async summarizeMultiplePapers(papers: Paper[]): Promise<Paper[]> {
     const summarizedPapers: Paper[] = [];
     
-    // Limit to 3 papers maximum
-    const limitedPapers = papers.slice(0, 3);
+    // Process all papers (Gemini has generous free limits)
+    const limitedPapers = papers;
     
     // Process papers sequentially with minimal throttling (Gemini has generous free limits)
     for (let i = 0; i < limitedPapers.length; i++) {
