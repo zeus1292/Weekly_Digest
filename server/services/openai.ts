@@ -6,8 +6,25 @@ export class OpenAIService {
 
   constructor() {
     this.openai = new OpenAI({ 
-      apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
+      apiKey: process.env.OPENAI_API_KEY
     });
+  }
+
+  async testConnection(): Promise<{ working: boolean; error?: string }> {
+    try {
+      // Make a simple test request to verify API key works
+      await this.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: "test" }],
+        max_tokens: 5,
+      });
+      return { working: true };
+    } catch (error) {
+      return { 
+        working: false, 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      };
+    }
   }
 
   async summarizePaper(paper: Paper): Promise<Paper> {

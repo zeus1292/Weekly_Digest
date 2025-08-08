@@ -10,6 +10,30 @@ const openaiService = new OpenAIService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Health check endpoint for OpenAI API
+  app.get("/api/health", async (req, res) => {
+    try {
+      // Test OpenAI connection with a simple request
+      const testResult = await openaiService.testConnection();
+      
+      res.json({
+        status: "healthy",
+        services: {
+          arxiv: "available",
+          openai: testResult.working ? "available" : "error",
+          openaiError: testResult.error || null
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "unhealthy",
+        error: error instanceof Error ? error.message : "Unknown error",
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   // Generate weekly digest endpoint
   app.post("/api/generate-digest", async (req, res) => {
     try {
@@ -30,6 +54,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           generatedDate: new Date().toISOString(),
           count: 0,
         });
+      }
+
+      // Check OpenAI API before processing
+      const healthCheck = await openaiService.testConnection();
+      if (!healthCheck.working) {
+        // Return papers without summaries if OpenAI is not working
+        const response = {
+          topic: validatedData.topic,
+          papers: papers,
+          generatedDate: new Date().toISOString(),
+          count: papers.length,
+          warning: "AI summaries unavailable: " + healthCheck.error
+        };
+        return res.json(response);
       }
 
       // Generate summaries using OpenAI

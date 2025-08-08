@@ -4,6 +4,7 @@ import { SearchForm } from "@/components/search-form";
 import { PaperCard } from "@/components/paper-card";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
+import { HealthCheck } from "@/components/health-check";
 import { apiRequest } from "@/lib/queryClient";
 import type { SearchRequest, DigestResponse } from "@shared/schema";
 import { Search, Share, Download } from "lucide-react";
@@ -54,6 +55,7 @@ export default function Home() {
               <h1 className="text-xl font-semibold text-gray-900">ResearchLens</h1>
             </div>
             <nav className="hidden md:flex items-center space-x-6">
+              <HealthCheck />
               <button 
                 onClick={handleNewSearch}
                 className="text-gray-700 hover:text-primary transition-colors"
@@ -110,6 +112,13 @@ export default function Home() {
                     day: 'numeric'
                   })}
                 </p>
+                {(digest as any).warning && (
+                  <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Note:</strong> {(digest as any).warning}
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="flex items-center space-x-3">
                 <button 
