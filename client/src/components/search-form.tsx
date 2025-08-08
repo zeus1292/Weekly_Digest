@@ -55,7 +55,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                       />
                       <Button
                         type="submit"
-                        className="px-4 py-3 bg-primary hover:bg-blue-700 rounded-lg"
+                        className="px-4 py-3 bg-primary text-white hover:bg-blue-700 rounded-lg shadow-sm border-0"
                       >
                         <Search className="w-4 h-4" />
                       </Button>
