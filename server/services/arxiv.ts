@@ -18,7 +18,7 @@ export class ArxivService {
     attributeNamePrefix: "@_"
   });
 
-  async searchPapers(topic: string, keywords?: string, subdomain?: string): Promise<Paper[]> {
+  async searchPapers(topic: string, keywords?: string, subdomain?: string, days: number = 7): Promise<Paper[]> {
     try {
       // Construct search query
       let searchQuery = `all:${topic}`;
@@ -35,10 +35,10 @@ export class ArxivService {
         searchQuery += ` AND (cat:cs.AI OR cat:cs.LG OR cat:cs.CL OR cat:cs.CV OR cat:cs.RO OR cat:cs.NE)`;
       }
 
-      // Get papers from last 7 days
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const dateFilter = sevenDaysAgo.toISOString().split('T')[0].replace(/-/g, '');
+      // Get papers from last N days
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+      const dateFilter = cutoffDate.toISOString().split('T')[0].replace(/-/g, '');
 
       const params = new URLSearchParams({
         search_query: searchQuery,
@@ -69,7 +69,7 @@ export class ArxivService {
       const papers: Paper[] = entries
         .filter(entry => {
           const publishedDate = new Date(entry.published);
-          return publishedDate >= sevenDaysAgo;
+          return publishedDate >= cutoffDate;
         })
         .map(entry => this.convertToPaper(entry))
         .slice(0, 10); // Return up to 10 papers for weekly digest

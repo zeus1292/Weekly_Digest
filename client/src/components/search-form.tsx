@@ -20,6 +20,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
       topic: "",
       keywords: "",
       subdomain: "all",
+      days: 7,
     },
   });
 
@@ -67,7 +68,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
             )}
           />
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <FormField
               control={form.control}
               name="keywords"
@@ -116,12 +117,40 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="days"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">
+                    Time Period (Days)
+                  </FormLabel>
+                  <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()}>
+                    <FormControl>
+                      <SelectTrigger className="px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white transition-all duration-200 hover:border-gray-300">
+                        <SelectValue placeholder="7 days" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="1">1 day</SelectItem>
+                      <SelectItem value="3">3 days</SelectItem>
+                      <SelectItem value="7">7 days</SelectItem>
+                      <SelectItem value="14">14 days</SelectItem>
+                      <SelectItem value="21">21 days</SelectItem>
+                      <SelectItem value="30">30 days</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           <div className="flex items-center justify-between pt-2">
             <div className="text-sm text-secondary flex items-center">
               <Clock className="w-4 h-4 mr-1" />
-              Papers from the last 7 days
+              Papers from selected time period
             </div>
             <Button
               type="submit"

@@ -46,7 +46,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const papers = await arxivService.searchPapers(
         validatedData.topic,
         validatedData.keywords,
-        validatedData.subdomain
+        validatedData.subdomain,
+        validatedData.days || 7
       );
 
       if (papers.length === 0) {
