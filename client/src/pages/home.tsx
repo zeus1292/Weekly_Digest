@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { SearchForm } from "@/components/search-form";
 import { PaperCard } from "@/components/paper-card";
+import { TechCrunchCard } from "@/components/techcrunch-card";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
-// import { HealthCheck } from "@/components/health-check";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import type { SearchRequest, DigestResponse } from "@shared/schema";
-import { Search, Share, Download } from "lucide-react";
+import { Search, Share, Download, BookOpen, Newspaper } from "lucide-react";
 
 export default function Home() {
   const [searchParams, setSearchParams] = useState<SearchRequest | null>(null);
@@ -100,7 +101,7 @@ export default function Home() {
                   Weekly Digest: <span className="text-primary">{digest.topic}</span>
                 </h2>
                 <p className="text-secondary mt-1">
-                  {digest.count} papers found • Generated on{' '}
+                  {digest.count} papers + {digest.techcrunchCount} articles found • Generated on{' '}
                   {new Date(digest.generatedDate).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long', 
@@ -139,14 +140,14 @@ export default function Home() {
             )}
 
 
-            {digest.papers.length === 0 ? (
+            {digest.papers.length === 0 && digest.techcrunchArticles.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="w-8 h-8 text-gray-400" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Papers Found</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Results Found</h3>
                 <p className="text-secondary mb-4">
-                  No recent papers found for "{digest.topic}". Try broadening your search terms or checking a different subdomain.
+                  No recent papers or articles found for "{digest.topic}". Try broadening your search terms or checking a different subdomain.
                 </p>
                 <button 
                   onClick={handleNewSearch}
@@ -156,11 +157,58 @@ export default function Home() {
                 </button>
               </div>
             ) : (
-              <div className="space-y-6">
-                {digest.papers.map((paper, index) => (
-                  <PaperCard key={paper.id} paper={paper} />
-                ))}
-              </div>
+              <Tabs defaultValue="arxiv" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="arxiv" className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    ArXiv Papers ({digest.count})
+                  </TabsTrigger>
+                  <TabsTrigger value="techcrunch" className="flex items-center gap-2">
+                    <Newspaper className="w-4 h-4" />
+                    TechCrunch ({digest.techcrunchCount})
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="arxiv" className="mt-6">
+                  {digest.papers.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <BookOpen className="w-6 h-6 text-gray-400" />
+                      </div>
+                      <h3 className="text-md font-medium text-gray-900 mb-2">No ArXiv Papers Found</h3>
+                      <p className="text-sm text-secondary">
+                        No recent papers found for "{digest.topic}" in the selected time frame.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {digest.papers.map((paper, index) => (
+                        <PaperCard key={paper.id} paper={paper} />
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="techcrunch" className="mt-6">
+                  {digest.techcrunchArticles.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Newspaper className="w-6 h-6 text-gray-400" />
+                      </div>
+                      <h3 className="text-md font-medium text-gray-900 mb-2">No TechCrunch Articles Found</h3>
+                      <p className="text-sm text-secondary">
+                        No recent articles found for "{digest.topic}" in the selected time frame.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {digest.techcrunchArticles.map((article, index) => (
+                        <TechCrunchCard key={article.id} article={article} />
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
             )}
           </section>
         )}

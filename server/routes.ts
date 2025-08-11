@@ -1,12 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { z } from "zod";
-import { searchRequestSchema, digestResponseSchema } from "@shared/schema";
+import { searchRequestSchema, digestResponseSchema, type DigestResponse } from "@shared/schema";
 import { ArxivService } from "./services/arxiv";
 import { GeminiService } from "./services/gemini";
+import { TechCrunchService } from "./services/techcrunch";
+import { GeminiTechCrunchService } from "./services/gemini-techcrunch";
 
 const arxivService = new ArxivService();
 const geminiService = new GeminiService();
+const techcrunchService = new TechCrunchService();
+const geminiTechCrunchService = new GeminiTechCrunchService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -42,45 +46,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate request body
       const validatedData = searchRequestSchema.parse(req.body);
       
-      // Fetch papers from ArXiv
-      const papers = await arxivService.searchPapers(
-        validatedData.topic,
-        validatedData.keywords,
-        validatedData.subdomain,
-        validatedData.days || 7
-      );
+      // Fetch papers from ArXiv and articles from TechCrunch in parallel
+      const [papers, techcrunchArticles] = await Promise.all([
+        arxivService.searchPapers(
+          validatedData.topic,
+          validatedData.keywords,
+          validatedData.subdomain,
+          validatedData.days || 7
+        ),
+        techcrunchService.searchArticles(
+          validatedData.topic,
+          validatedData.days || 7
+        ).catch(error => {
+          console.error('TechCrunch search failed:', error);
+          return []; // Return empty array if TechCrunch fails
+        })
+      ]);
 
-      if (papers.length === 0) {
+      console.log(`Found ${papers.length} papers from ArXiv and ${techcrunchArticles.length} articles from TechCrunch`);
+
+      if (papers.length === 0 && techcrunchArticles.length === 0) {
         return res.json({
           topic: validatedData.topic,
           papers: [],
+          techcrunchArticles: [],
           generatedDate: new Date().toISOString(),
           count: 0,
+          techcrunchCount: 0,
         });
       }
 
       // Check Gemini API before processing
       const healthCheck = await geminiService.testConnection();
       if (!healthCheck.working) {
-        // Return papers without summaries if Gemini is not working
-        const response = {
+        // Return results without summaries if Gemini is not working
+        const response: DigestResponse = {
           topic: validatedData.topic,
           papers: papers,
+          techcrunchArticles: techcrunchArticles,
           generatedDate: new Date().toISOString(),
           count: papers.length,
+          techcrunchCount: techcrunchArticles.length,
           warning: "AI summaries unavailable: " + healthCheck.error
         };
         return res.json(response);
       }
 
-      // Generate summaries using Gemini
-      const summarizedPapers = await geminiService.summarizeMultiplePapers(papers);
+      // Generate summaries using Gemini in parallel
+      const [summarizedPapers, summarizedArticles] = await Promise.all([
+        papers.length > 0 ? geminiService.summarizeMultiplePapers(papers) : Promise.resolve([]),
+        techcrunchArticles.length > 0 ? geminiTechCrunchService.generateSummaries(techcrunchArticles) : Promise.resolve([])
+      ]);
 
-      const response = {
+      const response: DigestResponse = {
         topic: validatedData.topic,
         papers: summarizedPapers,
+        techcrunchArticles: summarizedArticles,
         generatedDate: new Date().toISOString(),
         count: summarizedPapers.length,
+        techcrunchCount: summarizedArticles.length,
       };
 
       // Validate response

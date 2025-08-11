@@ -22,13 +22,29 @@ export const paperSchema = z.object({
   }).optional(),
 });
 
+export const techcrunchArticleSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  url: z.string(),
+  publishedDate: z.string(),
+  summary: z.object({
+    keyFindings: z.string(),
+    methodology: z.string(),
+    significance: z.string(),
+  }).optional(),
+});
+
 export const digestResponseSchema = z.object({
   topic: z.string(),
   papers: z.array(paperSchema),
+  techcrunchArticles: z.array(techcrunchArticleSchema),
   generatedDate: z.string(),
   count: z.number(),
+  techcrunchCount: z.number(),
+  warning: z.string().optional(),
 });
 
 export type SearchRequest = z.infer<typeof searchRequestSchema>;
 export type Paper = z.infer<typeof paperSchema>;
+export type TechCrunchArticle = z.infer<typeof techcrunchArticleSchema>;
 export type DigestResponse = z.infer<typeof digestResponseSchema>;
