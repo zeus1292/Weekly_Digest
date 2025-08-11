@@ -10,6 +10,26 @@ export class GeminiService {
     });
   }
 
+  // Validation function to check for potential hallucination indicators
+  private validateSummary(summary: any, paper: Paper): boolean {
+    if (!summary || typeof summary !== 'object') return false;
+    
+    // Check for common hallucination indicators
+    const hallucinationIndicators = [
+      'according to the study', 'the researchers found', 'the paper shows',
+      'based on experiments', 'the authors conclude', 'results indicate'
+    ];
+    
+    const summaryText = JSON.stringify(summary).toLowerCase();
+    
+    // If summary contains specific claims without evidence in the abstract, flag it
+    const hasSpecificClaims = hallucinationIndicators.some(indicator => 
+      summaryText.includes(indicator) && !paper.abstract.toLowerCase().includes(indicator.split(' ')[0])
+    );
+    
+    return !hasSpecificClaims;
+  }
+
   async testConnection(): Promise<{ working: boolean; error?: string }> {
     try {
       // Make a simple test request to verify API key works
@@ -33,23 +53,24 @@ export class GeminiService {
   async summarizePaper(paper: Paper): Promise<Paper> {
     try {
       const systemPrompt = `You are a research paper analysis expert. 
-Analyze the research paper and provide a structured summary in JSON format.
+CRITICAL: Only analyze the provided content. Do NOT add information not present in the title, authors, or abstract.
+If specific information is not available in the provided content, explicitly state "Not specified in the abstract" rather than inferring or making assumptions.
 Respond with JSON in this format: 
 {'keyFindings': 'string', 'methodology': 'string', 'significance': 'string'}`;
 
       const prompt = `
-Please analyze this research paper and provide a structured summary.
+Please analyze ONLY the information provided below. Do NOT infer, assume, or add any information not explicitly stated.
 
 Paper Title: ${paper.title}
 Authors: ${paper.authors}
 Abstract: ${paper.abstract}
 
-Provide a summary with the following structure:
-- keyFindings: Summarize the main discoveries, results, or contributions of this paper in 1-2 sentences
-- methodology: Describe the approach, methods, or techniques used in the research in 1-2 sentences
-- significance: Explain why this research matters and its potential impact or applications in 1-2 sentences
+Provide a summary with the following structure based ONLY on the provided content:
+- keyFindings: Summarize the main discoveries, results, or contributions mentioned in the abstract in 1-2 sentences. If not clear, state "Findings not detailed in abstract"
+- methodology: Describe the approach, methods, or techniques mentioned in the abstract in 1-2 sentences. If not specified, state "Methodology not specified in abstract"  
+- significance: Explain the importance or applications mentioned in the abstract in 1-2 sentences. If not stated, derive only from what's explicitly mentioned
 
-Focus on being concise, accurate, and highlighting practical implications.
+IMPORTANT: Stay strictly within the bounds of the provided information. Do not hallucinate or infer details not present.
 `;
 
       const response = await this.ai.models.generateContent({
@@ -66,6 +87,8 @@ Focus on being concise, accurate, and highlighting practical implications.
             },
             required: ["keyFindings", "methodology", "significance"],
           },
+          temperature: 0.1, // Lower temperature for more factual, less creative responses
+          topP: 0.8
         },
         contents: prompt,
       });
@@ -76,6 +99,19 @@ Focus on being concise, accurate, and highlighting practical implications.
       }
 
       const summary = JSON.parse(summaryContent);
+      
+      // Validate summary for potential hallucination
+      if (!this.validateSummary(summary, paper)) {
+        console.warn(`Potential hallucination detected for paper: ${paper.title}`);
+        return {
+          ...paper,
+          summary: {
+            keyFindings: "Analysis unavailable - please refer to the abstract",
+            methodology: "Methodology details - please refer to the abstract",
+            significance: "Significance assessment - please refer to the abstract"
+          }
+        };
+      }
       
       return {
         ...paper,
