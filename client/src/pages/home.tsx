@@ -212,29 +212,46 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
+            {/* Brand Section */}
+            <div className="flex-1 max-w-md">
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
                   <Search className="w-3 h-3 text-white" />
                 </div>
                 <span className="font-semibold text-gray-900">TechLens</span>
               </div>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-secondary leading-relaxed">
                 Stay current with technology trends through AI-powered research paper discovery and industry insights.
               </p>
             </div>
-            <div className="md:col-span-2"></div>
-            <div>
-              <h4 className="font-medium text-gray-900 mb-3">Connect</h4>
-              <ul className="space-y-2 text-sm text-secondary">
-                <li><a href="https://www.linkedin.com/in/akshaykumar-92/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900">LinkedIn</a></li>
-                <li><a href="https://akintsugi.carrd.co" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900">Website</a></li>
-              </ul>
+
+            {/* Connect Section */}
+            <div className="flex-shrink-0">
+              <h4 className="font-medium text-gray-900 mb-4">Connect</h4>
+              <div className="flex flex-col sm:flex-row md:flex-col gap-3">
+                <a 
+                  href="https://www.linkedin.com/in/akshaykumar-92/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 transition-all duration-200"
+                >
+                  LinkedIn
+                </a>
+                <a 
+                  href="https://akintsugi.carrd.co" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 transition-all duration-200"
+                >
+                  Website
+                </a>
+              </div>
             </div>
           </div>
-          <div className="border-t border-gray-200 mt-8 pt-8 text-center text-sm text-secondary">
+          
+          <div className="border-t border-gray-200 mt-8 pt-6 text-center text-sm text-secondary">
             © 2024 TechLens. All rights reserved.
           </div>
         </div>
