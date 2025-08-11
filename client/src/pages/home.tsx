@@ -5,10 +5,12 @@ import { PaperCard } from "@/components/paper-card";
 import { TechCrunchCard } from "@/components/techcrunch-card";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
+import { ExportMenu } from "@/components/export-menu";
+import { ShareMenu } from "@/components/share-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import type { SearchRequest, DigestResponse } from "@shared/schema";
-import { Search, Share, Download, BookOpen, Newspaper } from "lucide-react";
+import { Search, BookOpen, Newspaper } from "lucide-react";
 
 export default function Home() {
   const [searchParams, setSearchParams] = useState<SearchRequest | null>(null);
@@ -116,10 +118,8 @@ export default function Home() {
                 >
                   New Search
                 </button>
-                <button className="px-4 py-2 text-secondary hover:text-gray-900 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 transform hover:scale-105">
-                  <Download className="w-4 h-4 mr-2 inline" />
-                  Export
-                </button>
+                <ExportMenu digest={digest} />
+                <ShareMenu digest={digest} />n>
                 <button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
                   <Share className="w-4 h-4 mr-2 inline" />
                   Share
