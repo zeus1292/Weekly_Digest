@@ -58,7 +58,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
             )}
           />
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <FormField
               control={form.control}
               name="keywords"
@@ -74,35 +74,6 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="subdomain"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">
-                    Subdomain
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white transition-all duration-200 hover:border-gray-300">
-                        <SelectValue placeholder="All Areas" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="all">All Areas</SelectItem>
-                      <SelectItem value="cs.AI">Artificial Intelligence</SelectItem>
-                      <SelectItem value="cs.LG">Machine Learning</SelectItem>
-                      <SelectItem value="cs.CL">Natural Language Processing</SelectItem>
-                      <SelectItem value="cs.CV">Computer Vision</SelectItem>
-                      <SelectItem value="cs.RO">Robotics</SelectItem>
-                      <SelectItem value="cs.NE">Neural Networks</SelectItem>
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
