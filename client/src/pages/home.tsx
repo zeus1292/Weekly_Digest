@@ -56,7 +56,7 @@ export default function Home() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Search className="text-white w-4 h-4" />
               </div>
-              <h1 className="text-xl font-semibold text-gray-900">ResearchLens</h1>
+              <h1 className="text-xl font-semibold text-gray-900">TechLens</h1>
             </div>
             <nav className="hidden md:flex items-center space-x-6">
               {/* <HealthCheck /> */}
@@ -73,10 +73,10 @@ export default function Home() {
           <section className="mb-12">
             <div className="max-w-3xl mx-auto text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Stay Current with Academic Research
+                Stay Current with Technology Trends
               </h2>
               <p className="text-lg text-secondary">
-                Generate personalized weekly digests of the latest research papers from arXiv
+                Generate personalized weekly digests combining the latest research papers from arXiv with cutting-edge industry insights from TechCrunch
               </p>
             </div>
             <SearchForm onSearch={handleSearch} />
@@ -219,39 +219,23 @@ export default function Home() {
                 <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
                   <Search className="w-3 h-3 text-white" />
                 </div>
-                <span className="font-semibold text-gray-900">ResearchLens</span>
+                <span className="font-semibold text-gray-900">TechLens</span>
               </div>
               <p className="text-sm text-secondary">
-                Stay current with academic research through AI-powered paper discovery and summarization.
+                Stay current with technology trends through AI-powered research paper discovery and industry insights.
               </p>
             </div>
-            <div>
-              <h4 className="font-medium text-gray-900 mb-3">Product</h4>
-              <ul className="space-y-2 text-sm text-secondary">
-                <li><a href="#" className="hover:text-gray-900">Features</a></li>
-                <li><a href="#" className="hover:text-gray-900">Pricing</a></li>
-                <li><a href="#" className="hover:text-gray-900">API</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900 mb-3">Resources</h4>
-              <ul className="space-y-2 text-sm text-secondary">
-                <li><a href="#" className="hover:text-gray-900">Documentation</a></li>
-                <li><a href="#" className="hover:text-gray-900">Blog</a></li>
-                <li><a href="#" className="hover:text-gray-900">Support</a></li>
-              </ul>
-            </div>
+            <div className="md:col-span-2"></div>
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Connect</h4>
               <ul className="space-y-2 text-sm text-secondary">
-                <li><a href="#" className="hover:text-gray-900">Twitter</a></li>
-                <li><a href="#" className="hover:text-gray-900">GitHub</a></li>
-                <li><a href="#" className="hover:text-gray-900">Contact</a></li>
+                <li><a href="https://www.linkedin.com/in/akshaykumar-92/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900">LinkedIn</a></li>
+                <li><a href="https://akintsugi.carrd.co" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900">Website</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-200 mt-8 pt-8 text-center text-sm text-secondary">
-            © 2024 ResearchLens. All rights reserved.
+            © 2024 TechLens. All rights reserved.
           </div>
         </div>
       </footer>

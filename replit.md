@@ -1,8 +1,8 @@
-# ResearchLens - Academic Paper Discovery Platform
+# TechLens - Technology Trends Discovery Platform
 
 ## Overview
 
-ResearchLens is a web application that helps researchers stay current with academic literature by generating personalized weekly digests of recent papers from arXiv. The application leverages AI-powered summarization to provide structured, digestible insights from the latest research publications in various academic domains.
+TechLens is a web application that helps technology professionals stay current with the latest trends by generating personalized weekly digests combining recent research papers from arXiv with cutting-edge industry insights from TechCrunch. The application leverages AI-powered summarization to provide structured, digestible insights from both academic research and industry developments in various technology domains.
 
 ## User Preferences
 
