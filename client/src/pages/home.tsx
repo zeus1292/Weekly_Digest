@@ -10,7 +10,7 @@ import { ShareMenu } from "@/components/share-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest } from "@/lib/queryClient";
 import type { SearchRequest, DigestResponse } from "@shared/schema";
-import { Search, BookOpen, Newspaper } from "lucide-react";
+import { Search, BookOpen, Newspaper, Share } from "lucide-react";
 
 export default function Home() {
   const [searchParams, setSearchParams] = useState<SearchRequest | null>(null);
@@ -119,7 +119,7 @@ export default function Home() {
                   New Search
                 </button>
                 <ExportMenu digest={digest} />
-                <ShareMenu digest={digest} />n>
+                <ShareMenu digest={digest} />
                 <button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
                   <Share className="w-4 h-4 mr-2 inline" />
                   Share
