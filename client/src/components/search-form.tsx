@@ -1,13 +1,11 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { searchRequestSchema, type SearchRequest } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Sparkles, Clock, Search } from "lucide-react";
+import { Sparkles, Clock } from "lucide-react";
 
 interface SearchFormProps {
   onSearch: (params: SearchRequest) => void;
@@ -19,8 +17,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
     defaultValues: {
       topic: "",
       keywords: "",
-      subdomain: "all",
-      days: 7,
+      timeframeDays: 7,
     },
   });
 
@@ -81,7 +78,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
 
             <FormField
               control={form.control}
-              name="days"
+              name="timeframeDays"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-gray-700">
@@ -111,14 +108,14 @@ export function SearchForm({ onSearch }: SearchFormProps) {
           <div className="flex items-center justify-between pt-2">
             <div className="text-sm text-secondary flex items-center">
               <Clock className="w-4 h-4 mr-1" />
-              Papers from selected time period
+              Papers & articles from selected time period
             </div>
             <Button
               type="submit"
               className="px-6 py-3 bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 focus:ring-2 focus:ring-primary focus:ring-offset-2 shadow-lg"
             >
               <Sparkles className="w-5 h-5 mr-2 animate-pulse" />
-              Generate Weekly Digest
+              Research Now
             </Button>
           </div>
         </form>

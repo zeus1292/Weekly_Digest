@@ -1,5 +1,4 @@
 import { XMLParser } from 'fast-xml-parser';
-import { Paper } from '@shared/schema';
 
 export interface ArxivEntry {
   id: string;
@@ -11,6 +10,17 @@ export interface ArxivEntry {
   link: any;
 }
 
+// Raw paper data from ArXiv (before AI summarization)
+export interface ArxivPaper {
+  id: string;
+  title: string;
+  authors: string;
+  abstract: string;
+  arxivUrl: string;
+  publishedDate: string;
+  categories: string[];
+}
+
 export class ArxivService {
   private baseUrl = 'http://export.arxiv.org/api/query';
   private parser = new XMLParser({
@@ -18,7 +28,7 @@ export class ArxivService {
     attributeNamePrefix: "@_"
   });
 
-  async searchPapers(topic: string, keywords?: string, subdomain?: string, days: number = 7): Promise<Paper[]> {
+  async searchPapers(topic: string, keywords?: string, subdomain?: string, days: number = 7): Promise<ArxivPaper[]> {
     try {
       // Construct search query
       let searchQuery = `all:${topic}`;
@@ -65,8 +75,8 @@ export class ArxivService {
       // Handle both single entry and array of entries
       const entries: ArxivEntry[] = Array.isArray(feed.entry) ? feed.entry : [feed.entry];
       
-      // Filter by date and convert to our Paper format
-      const papers: Paper[] = entries
+      // Filter by date and convert to our ArxivPaper format
+      const papers: ArxivPaper[] = entries
         .filter(entry => {
           const publishedDate = new Date(entry.published);
           return publishedDate >= cutoffDate;
@@ -81,7 +91,7 @@ export class ArxivService {
     }
   }
 
-  private convertToPaper(entry: ArxivEntry): Paper {
+  private convertToPaper(entry: ArxivEntry): ArxivPaper {
     // Handle authors - can be single object or array
     let authors = '';
     if (Array.isArray(entry.author)) {

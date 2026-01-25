@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { SearchForm } from "@/components/search-form";
-import { PaperCard } from "@/components/paper-card";
-import { TechCrunchCard } from "@/components/techcrunch-card";
+import { ExecutiveSummary } from "@/components/executive-summary";
+import { PaperGrid } from "@/components/paper-grid";
+import { ArticleGrid } from "@/components/article-grid";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
-import { ExportMenu } from "@/components/export-menu";
-import { ShareMenu } from "@/components/share-menu";
+import { useAuth } from "@/context/auth-context";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { apiRequest } from "@/lib/queryClient";
 import type { SearchRequest, DigestResponse } from "@shared/schema";
-import { Search, BookOpen, Newspaper } from "lucide-react";
+import { Search, BookOpen, Newspaper, User, LogOut, History, ChevronDown } from "lucide-react";
 
 export default function Home() {
+  const { user, logout, isLoading: authLoading } = useAuth();
   const [searchParams, setSearchParams] = useState<SearchRequest | null>(null);
 
   const {
@@ -21,12 +25,11 @@ export default function Home() {
     error,
     refetch
   } = useQuery({
-    queryKey: ['/api/generate-digest', searchParams],
+    queryKey: ['/api/research', searchParams],
     queryFn: async () => {
       if (!searchParams) return null;
-      
-      const endpoint = '/api/generate-digest';
-      const response = await apiRequest('POST', endpoint, searchParams);
+
+      const response = await apiRequest('POST', '/api/research', searchParams);
       return response.json() as Promise<DigestResponse>;
     },
     enabled: !!searchParams,
@@ -47,19 +50,59 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
+            <Link href="/" className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Search className="text-white w-4 h-4" />
               </div>
-              <h1 className="text-xl font-semibold text-gray-900">TechLens</h1>
-            </div>
-            <nav className="hidden md:flex items-center space-x-6">
-              {/* <HealthCheck /> */}
+              <h1 className="text-xl font-semibold text-gray-900">Research Lens</h1>
+            </Link>
+            <nav className="flex items-center space-x-4">
+              {!authLoading && (
+                user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        <span className="hidden sm:inline">{user.email}</span>
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem asChild>
+                        <Link href="/history" className="flex items-center">
+                          <History className="w-4 h-4 mr-2" />
+                          Search History
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={logout} className="text-red-600">
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Link href="/history">
+                      <Button variant="ghost" size="sm">
+                        <History className="w-4 h-4 mr-2" />
+                        History
+                      </Button>
+                    </Link>
+                    <Link href="/login">
+                      <Button variant="outline" size="sm">Sign In</Button>
+                    </Link>
+                    <Link href="/register">
+                      <Button size="sm">Sign Up</Button>
+                    </Link>
+                  </div>
+                )
+              )}
             </nav>
           </div>
         </div>
@@ -67,16 +110,17 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {/* Search Section - Show when no search has been made or no results */}
+
+        {/* Search Section */}
         {!searchParams && (
           <section className="mb-12">
             <div className="max-w-3xl mx-auto text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Stay Current with Technology Trends
+                AI-Powered Research Discovery
               </h2>
-              <p className="text-lg text-secondary">
-                Generate personalized weekly digests combining the latest research papers from arXiv with cutting-edge industry insights from TechCrunch
+              <p className="text-lg text-gray-600">
+                Combine the latest academic papers from ArXiv with real-time web articles,
+                summarized by AI for actionable insights.
               </p>
             </div>
             <SearchForm onSearch={handleSearch} />
@@ -88,7 +132,7 @@ export default function Home() {
 
         {/* Error State */}
         {error && !isLoading && (
-          <ErrorState 
+          <ErrorState
             message={error instanceof Error ? error.message : "An error occurred"}
             onRetry={handleRetry}
           />
@@ -100,109 +144,67 @@ export default function Home() {
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Weekly Digest: <span className="text-primary">{digest.topic}</span>
+                  Research Results: <span className="text-primary">{digest.topic}</span>
                 </h2>
-                <p className="text-secondary mt-1">
-                  {digest.count} papers + {digest.techcrunchCount} articles found • Generated on{' '}
-                  {new Date(digest.generatedDate).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long', 
-                    day: 'numeric'
-                  })}
+                <p className="text-gray-600 mt-1">
+                  {digest.papers.count} papers + {digest.articles.count} articles •
+                  Last {digest.timeframeDays} days •
+                  Generated {new Date(digest.generatedAt).toLocaleDateString()}
                 </p>
               </div>
-              <div className="flex items-center space-x-3 ml-6">
-                <button 
-                  onClick={handleNewSearch}
-                  className="px-4 py-2 text-secondary hover:text-gray-900 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 transform hover:scale-105"
-                >
-                  New Search
-                </button>
-                <ExportMenu digest={digest} />
-                <ShareMenu digest={digest} />
-              </div>
+              <Button
+                onClick={handleNewSearch}
+                variant="outline"
+              >
+                New Search
+              </Button>
             </div>
 
-            {/* Full-width notifications */}
-            {(digest as any).warning && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded-lg shadow-sm">
+            {/* Warning Banner */}
+            {digest.warning && (
+              <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
                 <p className="text-sm text-yellow-800 flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  <strong>Note:</strong> {(digest as any).warning}
+                  <strong className="mr-1">Note:</strong> {digest.warning}
                 </p>
               </div>
             )}
 
+            {/* Executive Summaries */}
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <ExecutiveSummary
+                title="Research Papers"
+                summary={digest.papers.executiveSummary}
+                type="papers"
+                count={digest.papers.count}
+              />
+              <ExecutiveSummary
+                title="Web Articles"
+                summary={digest.articles.executiveSummary}
+                type="articles"
+                count={digest.articles.count}
+              />
+            </div>
 
-            {digest.papers.length === 0 && digest.techcrunchArticles.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-8 h-8 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Results Found</h3>
-                <p className="text-secondary mb-4">
-                  No recent papers or articles found for "{digest.topic}". Try broadening your search terms or checking a different subdomain.
-                </p>
-                <button 
-                  onClick={handleNewSearch}
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Try Different Search
-                </button>
-              </div>
-            ) : (
-              <Tabs defaultValue="arxiv" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="arxiv" className="flex items-center gap-2">
+            {/* Content Tabs */}
+            {(digest.papers.count > 0 || digest.articles.count > 0) && (
+              <Tabs defaultValue="papers" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="papers" className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4" />
-                    ArXiv Papers ({digest.count})
+                    Papers ({digest.papers.count})
                   </TabsTrigger>
-                  <TabsTrigger value="techcrunch" className="flex items-center gap-2">
+                  <TabsTrigger value="articles" className="flex items-center gap-2">
                     <Newspaper className="w-4 h-4" />
-                    TechCrunch ({digest.techcrunchCount})
+                    Articles ({digest.articles.count})
                   </TabsTrigger>
                 </TabsList>
-                
-                <TabsContent value="arxiv" className="mt-6">
-                  {digest.papers.length === 0 ? (
-                    <div className="text-center py-8">
-                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <BookOpen className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <h3 className="text-md font-medium text-gray-900 mb-2">No ArXiv Papers Found</h3>
-                      <p className="text-sm text-secondary">
-                        No recent papers found for "{digest.topic}" in the selected time frame.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {digest.papers.map((paper, index) => (
-                        <PaperCard key={paper.id} paper={paper} />
-                      ))}
-                    </div>
-                  )}
+
+                <TabsContent value="papers">
+                  <PaperGrid papers={digest.papers.items} />
                 </TabsContent>
-                
-                <TabsContent value="techcrunch" className="mt-6">
-                  {digest.techcrunchArticles.length === 0 ? (
-                    <div className="text-center py-8">
-                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Newspaper className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <h3 className="text-md font-medium text-gray-900 mb-2">No TechCrunch Articles Found</h3>
-                      <p className="text-sm text-secondary">
-                        No recent articles found for "{digest.topic}" in the selected time frame.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {digest.techcrunchArticles.map((article, index) => (
-                        <TechCrunchCard key={article.id} article={article} />
-                      ))}
-                    </div>
-                  )}
+
+                <TabsContent value="articles">
+                  <ArticleGrid articles={digest.articles.items} />
                 </TabsContent>
               </Tabs>
             )}
@@ -212,47 +214,17 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
-            {/* Brand Section */}
-            <div className="flex-1 max-w-md">
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
-                  <Search className="w-3 h-3 text-white" />
-                </div>
-                <span className="font-semibold text-gray-900">TechLens</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
+                <Search className="w-3 h-3 text-white" />
               </div>
-              <p className="text-sm text-secondary leading-relaxed">
-                Stay current with technology trends through AI-powered research paper discovery and industry insights.
-              </p>
+              <span className="font-semibold text-gray-900">Research Lens</span>
             </div>
-
-            {/* Connect Section */}
-            <div className="flex-shrink-0">
-              <h4 className="font-medium text-gray-900 mb-4">Connect</h4>
-              <div className="flex flex-col sm:flex-row md:flex-col gap-3">
-                <a 
-                  href="https://www.linkedin.com/in/akshaykumar-92/" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 transition-all duration-200"
-                >
-                  LinkedIn
-                </a>
-                <a 
-                  href="https://akintsugi.carrd.co" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 transition-all duration-200"
-                >
-                  Website
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-200 mt-8 pt-6 text-center text-sm text-secondary">
-            © 2024 TechLens. All rights reserved.
+            <p className="text-sm text-gray-500">
+              AI-powered research aggregation combining ArXiv papers and web articles.
+            </p>
           </div>
         </div>
       </footer>

@@ -1,5 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
-import { Paper } from '@shared/schema';
+import type { ArxivPaper } from "./arxiv";
+
+// Extended paper type with summary (legacy support)
+interface PaperWithSummary extends ArxivPaper {
+  summary?: {
+    keyFindings: string;
+    methodology: string;
+    significance: string;
+  };
+}
 
 export class GeminiService {
   private ai: GoogleGenAI;
@@ -11,7 +20,7 @@ export class GeminiService {
   }
 
   // Validation function to check for potential hallucination indicators
-  private validateSummary(summary: any, paper: Paper): boolean {
+  private validateSummary(summary: any, paper: ArxivPaper): boolean {
     if (!summary || typeof summary !== 'object') return false;
     
     // Check for common hallucination indicators
@@ -50,7 +59,7 @@ export class GeminiService {
     }
   }
 
-  async summarizePaper(paper: Paper): Promise<Paper> {
+  async summarizePaper(paper: ArxivPaper): Promise<PaperWithSummary> {
     try {
       const systemPrompt = `You are a research paper analysis expert. 
 CRITICAL: Only analyze the provided content. Do NOT add information not present in the title, authors, or abstract.
@@ -136,8 +145,8 @@ IMPORTANT: Stay strictly within the bounds of the provided information. Do not h
     }
   }
 
-  async summarizeMultiplePapers(papers: Paper[]): Promise<Paper[]> {
-    const summarizedPapers: Paper[] = [];
+  async summarizeMultiplePapers(papers: ArxivPaper[]): Promise<PaperWithSummary[]> {
+    const summarizedPapers: PaperWithSummary[] = [];
     
     // Process all papers (Gemini has generous free limits)
     const limitedPapers = papers;
