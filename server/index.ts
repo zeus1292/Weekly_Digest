@@ -1,3 +1,6 @@
+// IMPORTANT: Import config first to initialize LangSmith before LangChain loads
+import "./config";
+
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { registerRoutes } from "./routes";

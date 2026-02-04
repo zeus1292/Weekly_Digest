@@ -2,6 +2,7 @@ import { Annotation, StateGraph, START, END } from "@langchain/langgraph";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ArxivService } from "../services/arxiv";
 import { tavilyService } from "../services/tavily";
+import { IS_TRACING_ENABLED, GOOGLE_API_KEY } from "../config";
 import type { PaperSummary, Article, DigestResponse } from "../../shared/schema";
 
 // State definition for the research agent workflow
@@ -33,12 +34,15 @@ type ResearchStateType = typeof ResearchState.State;
 // Initialize services
 const arxivService = new ArxivService();
 
-// Initialize LangChain Gemini model
-function getGeminiModel() {
+// Initialize LangChain Gemini model with tracing metadata
+function getGeminiModel(runName?: string) {
   return new ChatGoogleGenerativeAI({
     model: "gemini-2.5-flash",
     temperature: 0.1,
-    apiKey: process.env.GOOGLE_API_KEY,
+    apiKey: GOOGLE_API_KEY,
+  }).withConfig({
+    runName: runName || "gemini-research",
+    tags: ["research-lens", "gemini"],
   });
 }
 
@@ -100,12 +104,15 @@ async function fetchArticles(state: ResearchStateType): Promise<Partial<Research
 // Node: Generate summaries for papers using Gemini
 async function summarizePapers(state: ResearchStateType): Promise<Partial<ResearchStateType>> {
   console.log(`[ResearchAgent] Summarizing ${state.papers.length} papers`);
+  if (IS_TRACING_ENABLED) {
+    console.log(`[ResearchAgent] LangSmith tracing active for paper summarization`);
+  }
 
   if (state.papers.length === 0) {
     return { papers: [] };
   }
 
-  const model = getGeminiModel();
+  const model = getGeminiModel("paper-summarizer");
   const summarizedPapers: PaperSummary[] = [];
 
   for (const paper of state.papers) {
@@ -171,7 +178,7 @@ async function generatePaperExecutiveSummary(state: ResearchStateType): Promise<
     return { paperExecutiveSummary: "No papers found for this topic and timeframe." };
   }
 
-  const model = getGeminiModel();
+  const model = getGeminiModel("paper-executive-summary");
 
   const papersList = state.papers
     .map((p, i) => `${i + 1}. "${p.title}" - ${p.summary.problemStatement}`)
@@ -205,7 +212,7 @@ async function generateArticleExecutiveSummary(state: ResearchStateType): Promis
     return { articleExecutiveSummary: "No articles found for this topic and timeframe." };
   }
 
-  const model = getGeminiModel();
+  const model = getGeminiModel("article-executive-summary");
 
   const articlesList = state.articles
     .map((a, i) => `${i + 1}. "${a.title}" (${a.source})`)
@@ -260,6 +267,9 @@ export async function runResearchAgent(
   keywords?: string
 ): Promise<DigestResponse> {
   console.log(`[ResearchAgent] Starting research for topic: "${topic}"`);
+  if (IS_TRACING_ENABLED) {
+    console.log(`[ResearchAgent] LangSmith tracing enabled - traces visible at smith.langchain.com`);
+  }
 
   const graph = buildResearchGraph();
 
@@ -275,7 +285,16 @@ export async function runResearchAgent(
   };
 
   try {
-    const result = await graph.invoke(initialState);
+    // Invoke with tracing metadata
+    const result = await graph.invoke(initialState, {
+      runName: `research-${topic.slice(0, 30)}`,
+      tags: ["research-lens", "research-workflow"],
+      metadata: {
+        topic,
+        timeframeDays,
+        keywords: keywords || "none",
+      },
+    });
 
     // Transform to DigestResponse format
     const response: DigestResponse = {
