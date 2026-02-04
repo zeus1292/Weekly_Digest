@@ -11,17 +11,17 @@ if (LANGCHAIN_TRACING && process.env.LANGCHAIN_API_KEY) {
 }
 
 // Lazy imports to avoid cold start issues
-let runResearchAgent: typeof import("../server/agents/research-agent").runResearchAgent;
-let searchRequestSchema: typeof import("../shared/schema").searchRequestSchema;
-let digestResponseSchema: typeof import("../shared/schema").digestResponseSchema;
+let runResearchAgent: typeof import("../../server/agents/research-agent").runResearchAgent;
+let searchRequestSchema: typeof import("../../shared/schema").searchRequestSchema;
+let digestResponseSchema: typeof import("../../shared/schema").digestResponseSchema;
 
 async function loadDependencies() {
   if (!runResearchAgent) {
-    const agentModule = await import("../server/agents/research-agent");
+    const agentModule = await import("../../server/agents/research-agent");
     runResearchAgent = agentModule.runResearchAgent;
   }
   if (!searchRequestSchema) {
-    const schemaModule = await import("../shared/schema");
+    const schemaModule = await import("../../shared/schema");
     searchRequestSchema = schemaModule.searchRequestSchema;
     digestResponseSchema = schemaModule.digestResponseSchema;
   }
