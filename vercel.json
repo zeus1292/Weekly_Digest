@@ -1,15 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "vite build",
+  "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist/public",
   "functions": {
-    "api/**/*.ts": {
-      "maxDuration": 60,
-      "includeFiles": "server/**,shared/**"
+    "dist/api/**/*.js": {
+      "maxDuration": 60
     }
   },
   "rewrites": [
-    { "source": "/((?!api|assets).*)", "destination": "/index.html" }
+    { "source": "/api/health", "destination": "/dist/api/health" },
+    { "source": "/api/research", "destination": "/dist/api/research" },
+    { "source": "/api", "destination": "/dist/api/index" },
+    { "source": "/((?!api|assets|dist).*)", "destination": "/index.html" }
   ]
 }
