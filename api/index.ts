@@ -1,9 +1,16 @@
 // Vercel Serverless Function wrapper for Express app
-import "../server/config";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import express from "express";
 import session from "express-session";
-import { registerRoutes } from "../server/routes";
+import { z } from "zod";
+import { searchRequestSchema, digestResponseSchema } from "../shared/schema";
+import { runResearchAgent } from "../server/agents/research-agent";
+import { db, schema } from "../server/db";
 import { authRouter } from "../server/auth";
+import { eq, desc } from "drizzle-orm";
+
+// Import config to initialize LangSmith
+import "../server/config";
 
 const app = express();
 app.use(express.json());
@@ -19,21 +26,13 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     },
   })
 );
 
-// Register auth routes
+// Auth routes
 app.use("/api/auth", authRouter);
-
-// Register API routes (this adds /api/research, /api/health, /api/history)
-// Note: For Vercel, we need to handle routes directly
-import { z } from "zod";
-import { searchRequestSchema, digestResponseSchema } from "../shared/schema";
-import { runResearchAgent } from "../server/agents/research-agent";
-import { db, schema } from "../server/db";
-import { eq, and, desc } from "drizzle-orm";
 
 // Health check
 app.get("/api/health", async (_req, res) => {
@@ -53,6 +52,8 @@ app.get("/api/health", async (_req, res) => {
 app.post("/api/research", async (req, res) => {
   try {
     const validatedData = searchRequestSchema.parse(req.body);
+    console.log(`[API] Research request: topic="${validatedData.topic}"`);
+
     const result = await runResearchAgent(
       validatedData.topic,
       validatedData.timeframeDays,
@@ -62,7 +63,7 @@ app.post("/api/research", async (req, res) => {
     // Save to history if database available
     if (db) {
       try {
-        const userId = req.session?.userId;
+        const userId = (req.session as any)?.userId;
         const sessionId = req.session?.id;
         if (userId || sessionId) {
           await db.insert(schema.searchHistory).values({
@@ -99,11 +100,11 @@ app.post("/api/research", async (req, res) => {
 // History endpoints
 app.get("/api/history", async (req, res) => {
   if (!db) {
-    res.json({ items: [] });
+    res.json({ items: [], message: "History disabled" });
     return;
   }
 
-  const userId = req.session?.userId;
+  const userId = (req.session as any)?.userId;
   const sessionId = req.session?.id;
 
   if (!userId && !sessionId) {
@@ -143,4 +144,7 @@ app.get("/api/history", async (req, res) => {
   }
 });
 
-export default app;
+// Vercel serverless handler
+export default function handler(req: VercelRequest, res: VercelResponse) {
+  return app(req as any, res as any);
+}
