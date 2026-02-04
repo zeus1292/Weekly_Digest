@@ -13,10 +13,10 @@ from typing import TypedDict, List, Optional
 from dataclasses import asdict
 
 from langgraph.graph import StateGraph, START, END
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnableConfig
 
-from backend.config import GOOGLE_API_KEY, LANGCHAIN_TRACING_V2
+from backend.config import OPENAI_API_KEY, LANGCHAIN_TRACING_V2
 from backend.services.arxiv import arxiv_service, ArxivPaper
 from backend.services.tavily_search import tavily_service, Article
 
@@ -41,16 +41,16 @@ class ResearchState(TypedDict):
 # LLM Setup
 # =============================================================================
 
-def get_llm(run_name: str = "gemini-research"):
-    """Get the Gemini LLM instance with tracing metadata."""
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
-        google_api_key=GOOGLE_API_KEY,
+def get_llm(run_name: str = "openai-research"):
+    """Get the OpenAI LLM instance with tracing metadata."""
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        api_key=OPENAI_API_KEY,
         temperature=0.1
     )
     return llm.with_config(
         run_name=run_name,
-        tags=["research-lens", "gemini"]
+        tags=["research-lens", "openai"]
     )
 
 

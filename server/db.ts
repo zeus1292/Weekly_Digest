@@ -2,11 +2,15 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "../shared/schema";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required");
+// Database is optional - app works without it (no history/auth)
+let db: ReturnType<typeof drizzle> | null = null;
+
+if (process.env.DATABASE_URL) {
+  const sql = neon(process.env.DATABASE_URL);
+  db = drizzle(sql, { schema });
+  console.log("[DB] Connected to PostgreSQL");
+} else {
+  console.log("[DB] No DATABASE_URL set - running without database (history/auth disabled)");
 }
 
-const sql = neon(process.env.DATABASE_URL);
-export const db = drizzle(sql, { schema });
-
-export { schema };
+export { db, schema };

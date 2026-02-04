@@ -11,6 +11,7 @@ dotenv.config();
 
 // API Keys
 export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || "";
+export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 export const TAVILY_API_KEY = process.env.TAVILY_API_KEY || "";
 
 // LangSmith Observability

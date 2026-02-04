@@ -19,7 +19,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         services: {
           arxiv: "available",
           tavily: process.env.TAVILY_API_KEY ? "available" : "not configured",
-          gemini: process.env.GOOGLE_API_KEY ? "available" : "not configured",
+          openai: process.env.OPENAI_API_KEY ? "available" : "not configured",
+          database: db ? "available" : "not configured (history/auth disabled)",
         },
         timestamp: new Date().toISOString(),
       });
@@ -47,30 +48,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedData.keywords
       );
 
-      // Save to history if user is logged in or has a session
-      try {
-        const userId = req.session?.userId;
-        const sessionId = req.session?.id;
+      // Save to history if database is available and user is logged in or has a session
+      if (db) {
+        try {
+          const userId = req.session?.userId;
+          const sessionId = req.session?.id;
 
-        if (userId || sessionId) {
-          await db.insert(schema.searchHistory).values({
-            userId: userId || null,
-            sessionId: !userId ? sessionId : null,
-            topic: validatedData.topic,
-            keywords: validatedData.keywords || null,
-            timeframeDays: validatedData.timeframeDays,
-            paperCount: result.papers.count,
-            articleCount: result.articles.count,
-            executiveSummary: {
-              papers: result.papers.executiveSummary,
-              articles: result.articles.executiveSummary,
-            },
-            results: result,
-          });
+          if (userId || sessionId) {
+            await db.insert(schema.searchHistory).values({
+              userId: userId || null,
+              sessionId: !userId ? sessionId : null,
+              topic: validatedData.topic,
+              keywords: validatedData.keywords || null,
+              timeframeDays: validatedData.timeframeDays,
+              paperCount: result.papers.count,
+              articleCount: result.articles.count,
+              executiveSummary: {
+                papers: result.papers.executiveSummary,
+                articles: result.articles.executiveSummary,
+              },
+              results: result,
+            });
+          }
+        } catch (historyError) {
+          console.error("[Routes] Failed to save to history:", historyError);
+          // Don't fail the request if history save fails
         }
-      } catch (historyError) {
-        console.error("[Routes] Failed to save to history:", historyError);
-        // Don't fail the request if history save fails
       }
 
       // Validate and return response
@@ -122,6 +125,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // GET /api/history - Get user's search history
   app.get("/api/history", async (req: Request, res: Response) => {
+    // Return empty if no database
+    if (!db) {
+      res.json({ items: [], message: "History disabled (no database configured)" });
+      return;
+    }
+
     try {
       const userId = req.session?.userId;
       const sessionId = req.session?.id;
@@ -168,6 +177,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // GET /api/history/:id - Get specific search result
   app.get("/api/history/:id", async (req: Request, res: Response) => {
+    if (!db) {
+      res.status(503).json({ error: "History disabled (no database configured)" });
+      return;
+    }
+
     try {
       const { id } = req.params;
       const userId = req.session?.userId;
@@ -209,6 +223,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // DELETE /api/history/:id - Delete history item
   app.delete("/api/history/:id", async (req: Request, res: Response) => {
+    if (!db) {
+      res.status(503).json({ error: "History disabled (no database configured)" });
+      return;
+    }
+
     try {
       const { id } = req.params;
       const userId = req.session?.userId;

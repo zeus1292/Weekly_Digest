@@ -20,7 +20,7 @@ class ArxivPaper:
 class ArxivService:
     """Service for fetching papers from ArXiv API."""
 
-    BASE_URL = "http://export.arxiv.org/api/query"
+    BASE_URL = "https://export.arxiv.org/api/query"
 
     async def search_papers(
         self,

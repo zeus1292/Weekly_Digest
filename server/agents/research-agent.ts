@@ -1,8 +1,8 @@
 import { Annotation, StateGraph, START, END } from "@langchain/langgraph";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatOpenAI } from "@langchain/openai";
 import { ArxivService } from "../services/arxiv";
 import { tavilyService } from "../services/tavily";
-import { IS_TRACING_ENABLED, GOOGLE_API_KEY } from "../config";
+import { IS_TRACING_ENABLED, OPENAI_API_KEY } from "../config";
 import type { PaperSummary, Article, DigestResponse } from "../../shared/schema";
 
 // State definition for the research agent workflow
@@ -34,15 +34,15 @@ type ResearchStateType = typeof ResearchState.State;
 // Initialize services
 const arxivService = new ArxivService();
 
-// Initialize LangChain Gemini model with tracing metadata
-function getGeminiModel(runName?: string) {
-  return new ChatGoogleGenerativeAI({
-    model: "gemini-2.5-flash",
+// Initialize LangChain OpenAI model with tracing metadata
+function getModel(runName?: string) {
+  return new ChatOpenAI({
+    model: "gpt-4o-mini",
     temperature: 0.1,
-    apiKey: GOOGLE_API_KEY,
+    apiKey: OPENAI_API_KEY,
   }).withConfig({
-    runName: runName || "gemini-research",
-    tags: ["research-lens", "gemini"],
+    runName: runName || "openai-research",
+    tags: ["research-lens", "openai"],
   });
 }
 
@@ -112,7 +112,7 @@ async function summarizePapers(state: ResearchStateType): Promise<Partial<Resear
     return { papers: [] };
   }
 
-  const model = getGeminiModel("paper-summarizer");
+  const model = getModel("paper-summarizer");
   const summarizedPapers: PaperSummary[] = [];
 
   for (const paper of state.papers) {
@@ -178,7 +178,7 @@ async function generatePaperExecutiveSummary(state: ResearchStateType): Promise<
     return { paperExecutiveSummary: "No papers found for this topic and timeframe." };
   }
 
-  const model = getGeminiModel("paper-executive-summary");
+  const model = getModel("paper-executive-summary");
 
   const papersList = state.papers
     .map((p, i) => `${i + 1}. "${p.title}" - ${p.summary.problemStatement}`)
@@ -212,7 +212,7 @@ async function generateArticleExecutiveSummary(state: ResearchStateType): Promis
     return { articleExecutiveSummary: "No articles found for this topic and timeframe." };
   }
 
-  const model = getGeminiModel("article-executive-summary");
+  const model = getModel("article-executive-summary");
 
   const articlesList = state.articles
     .map((a, i) => `${i + 1}. "${a.title}" (${a.source})`)

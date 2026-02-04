@@ -17,6 +17,11 @@ const router = Router();
 
 // POST /api/auth/register - Create new user account
 router.post("/register", async (req: Request, res: Response) => {
+  if (!db) {
+    res.status(503).json({ error: "Authentication disabled (no database configured)" });
+    return;
+  }
+
   try {
     // Validate request body
     const result = registerSchema.safeParse(req.body);
@@ -75,6 +80,11 @@ router.post("/register", async (req: Request, res: Response) => {
 
 // POST /api/auth/login - Login with email/password
 router.post("/login", async (req: Request, res: Response) => {
+  if (!db) {
+    res.status(503).json({ error: "Authentication disabled (no database configured)" });
+    return;
+  }
+
   try {
     // Validate request body
     const result = loginSchema.safeParse(req.body);
@@ -138,6 +148,12 @@ router.post("/logout", (req: Request, res: Response) => {
 
 // GET /api/auth/me - Get current user (or null)
 router.get("/me", async (req: Request, res: Response) => {
+  // If no database, return null user but still provide session
+  if (!db) {
+    res.json({ user: null, sessionId: req.session.id, message: "Auth disabled (no database)" });
+    return;
+  }
+
   try {
     if (!req.session.userId) {
       res.json({ user: null, sessionId: req.session.id });
