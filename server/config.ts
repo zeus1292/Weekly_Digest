@@ -2,12 +2,11 @@
  * Server configuration - loads and validates environment variables
  * IMPORTANT: This file must be imported before any LangChain imports
  * to ensure tracing environment variables are set.
+ *
+ * NOTE: dotenv is NOT used here - it causes issues in serverless environments.
+ * For local dev, use the dotenv package in server/index.ts or run with dotenv CLI.
+ * For production/Vercel, env vars are injected directly.
  */
-
-import dotenv from "dotenv";
-
-// Load .env file
-dotenv.config();
 
 // API Keys
 export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || "";

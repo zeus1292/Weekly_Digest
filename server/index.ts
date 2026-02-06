@@ -1,3 +1,7 @@
+// Load environment variables for local development
+// This is safe here because server/index.ts is NOT used in Vercel serverless
+import "dotenv/config";
+
 // IMPORTANT: Import config first to initialize LangSmith before LangChain loads
 import "./config";
 
